@@ -1,13 +1,13 @@
 require 'rubygems'
 require 'socket'
-require 'libwebsocket'
+#require 'libwebsocket'
 
 module PusherClient
   class WebSocket
 
     def initialize(url, encrypted = false, params = {})
       @hs ||= LibWebSocket::OpeningHandshake::Client.new(:url => url, :version => params[:version])
-      @frame ||= LibWebSocket::Frame.new
+      @frame ||= LibWebSocket::Frame.new(:version => 'draft-ietf-hybi-00')
 
       tcp_socket = TCPSocket.new(@hs.url.host, @hs.url.port || 80)
       if encrypted
@@ -18,11 +18,10 @@ module PusherClient
         @socket = tcp_socket
       end
       @socket.write(@hs.to_s)
-      @socket.write("\r\n\r\n")
       @socket.flush
 
       loop do
-        data = @socket.gets
+        data = @socket.getc
         next if data.nil?
 
         result = @hs.parse(data)
@@ -39,7 +38,7 @@ module PusherClient
     def send(data)
       raise "no handshake!" unless @handshaked
 
-      data = @frame.new(data).to_s
+      data = LibWebSocket::Frame.new(:buffer => data, :version => 'draft-ietf-hybi-00').to_s
       @socket.write data
       @socket.flush
     end

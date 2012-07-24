@@ -5,8 +5,6 @@ GEM
     archive-tar-minitar (0.5.2)
     bacon (1.1.0)
     columnize (0.3.6)
-    libwebsocket (0.1.4)
-      addressable
     linecache19 (0.5.12)
       ruby_core_source (>= 0.1.4)
     rcov (0.9.9)
@@ -30,7 +28,6 @@ PLATFORMS
 DEPENDENCIES
   addressable
   bacon
-  libwebsocket (~> 0.1.0)
   rcov
   ruby-debug19
   ruby-hmac (~> 0.4.0)

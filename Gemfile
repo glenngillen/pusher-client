@@ -1,6 +1,6 @@
 source "http://rubygems.org"
 
-gem "libwebsocket", "~>0.1.0"
+#gem "libwebsocket", "~>0.1.0"
 gem "ruby-hmac", "~> 0.4.0"
 gem "addressable"
 gem "ruby-debug19"
