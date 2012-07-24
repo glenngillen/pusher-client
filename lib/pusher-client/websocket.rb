@@ -5,20 +5,27 @@ require 'libwebsocket'
 module PusherClient
   class WebSocket
 
-    def initialize(url, params = {})
+    def initialize(url, encrypted = false, params = {})
       @hs ||= LibWebSocket::OpeningHandshake::Client.new(:url => url, :version => params[:version])
       @frame ||= LibWebSocket::Frame.new
 
-      @socket = TCPSocket.new(@hs.url.host, @hs.url.port || 80)
-
+      tcp_socket = TCPSocket.new(@hs.url.host, @hs.url.port || 80)
+      if encrypted
+        @socket = OpenSSL::SSL::SSLSocket.new(tcp_socket)
+        @socket.sync_close = true
+        @socket.connect
+      else
+        @socket = tcp_socket
+      end
       @socket.write(@hs.to_s)
+      @socket.write("\r\n\r\n")
       @socket.flush
 
       loop do
-        data = @socket.getc
+        data = @socket.gets
         next if data.nil?
 
-        result = @hs.parse(data.chr)
+        result = @hs.parse(data)
 
         raise @hs.error unless result
 
